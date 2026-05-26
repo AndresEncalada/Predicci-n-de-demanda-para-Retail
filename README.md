@@ -52,12 +52,12 @@
 ├── README.md                 # Este archivo
 ├── .gitignore               # Archivos a ignorar en git
 │
-├── data/                    # Datos reales
+├── data/                    # Datos reales (No se incluyen por privacidad)
 ├── data_sample/             # Datos para test
 │   ├── productos.csv
 │   └── ventas.csv
 │
-├── models/                  # Modelos entrenados
+├── models/                  # Modelos generados (No se incluyen debido al peso)
 └── notebooks/               # Cuadernos Jupyter
     ├── EDA.ipynb           # Análisis exploratorio de datos
     └── Modelado.ipynb      # Desarrollo y entrenamiento de modelos

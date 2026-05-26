@@ -50,10 +50,12 @@ venv.bak/
 .jupyter/
 
 # Data files
-data/
+data/*
+!data/.gitkeep
 
 # Modelos entrenados
-models/
+models/*
+!models/.gitkeep
 *.onnx
 *.h5
 *.pkl
