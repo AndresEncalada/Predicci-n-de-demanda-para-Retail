@@ -15,7 +15,7 @@
 
 2. **Crear entorno virtual**
    ```bash
-   python -m venv venv
+   python -3.11 -m venv venv
    ```
 
 3. **Activar el entorno virtual**
