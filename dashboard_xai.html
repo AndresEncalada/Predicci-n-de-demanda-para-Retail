@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard XAI — Predicción de Demanda Retail</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#F7F6F2;
+  --surface:#FFFFFF;
+  --surface2:#F0EFE9;
+  --border:#E2E0D8;
+  --text:#1A1916;
+  --text2:#6B6860;
+  --text3:#9E9C96;
+  --blue:#1A5FBF;
+  --blue-light:#E8F0FC;
+  --green:#1A7A4A;
+  --green-light:#E6F4EC;
+  --red:#B83232;
+  --red-light:#FBEBEB;
+  --amber:#B86A00;
+  --amber-light:#FDF3E3;
+  --accent:#1A5FBF;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:2rem}
+.header{margin-bottom:2.5rem;border-bottom:1px solid var(--border);padding-bottom:1.5rem}
+.header-top{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem}
+.header h1{font-size:1.6rem;font-weight:600;letter-spacing:-0.02em;line-height:1.2}
+.header p{font-size:0.875rem;color:var(--text2);margin-top:0.4rem;max-width:520px}
+.tag{display:inline-block;font-size:0.7rem;font-family:'DM Mono',monospace;background:var(--blue-light);color:var(--blue);padding:3px 10px;border-radius:20px;font-weight:500;letter-spacing:0.03em}
+
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem}
+.metric-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.25rem 1.5rem}
+.metric-card .label{font-size:0.75rem;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;font-weight:500;margin-bottom:0.5rem}
+.metric-card .value{font-size:1.75rem;font-weight:600;letter-spacing:-0.03em;color:var(--text)}
+.metric-card .sub{font-size:0.75rem;color:var(--text3);margin-top:0.25rem}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.5rem}
+.card-title{font-size:0.8rem;text-transform:uppercase;letter-spacing:0.07em;font-weight:600;color:var(--text2);margin-bottom:1.25rem}
+
+.bar-row{margin-bottom:0.75rem}
+.bar-label{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.3rem}
+.bar-label span:first-child{font-size:0.825rem;color:var(--text)}
+.bar-label span:last-child{font-size:0.75rem;font-family:'DM Mono',monospace;color:var(--text2)}
+.bar-track{height:8px;background:var(--surface2);border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;background:var(--blue);transition:width 0.8s cubic-bezier(.4,0,.2,1)}
+
+.insight-item{background:var(--surface2);border-radius:8px;padding:0.875rem 1rem;margin-bottom:0.625rem;font-size:0.825rem;line-height:1.5}
+.insight-item strong{color:var(--text);font-weight:500}
+.insight-item span{color:var(--text2)}
+
+.prod-tabs{display:flex;gap:0.5rem;margin-bottom:1.5rem;flex-wrap:wrap}
+.prod-tab{padding:0.5rem 1rem;border:1px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text2);font-size:0.825rem;cursor:pointer;transition:all 0.15s;font-family:'DM Sans',sans-serif;font-weight:400}
+.prod-tab:hover{border-color:var(--blue);color:var(--blue)}
+.prod-tab.active{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:500}
+
+.pred-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.75rem;margin-bottom:1.5rem}
+.pred-cell{background:var(--surface2);border-radius:8px;padding:1rem}
+.pred-cell .plabel{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--text3);margin-bottom:0.35rem;font-weight:500}
+.pred-cell .pval{font-size:1.3rem;font-weight:600;letter-spacing:-0.02em}
+.pred-cell .pctx{font-size:0.75rem;color:var(--text2);margin-top:0.2rem}
+
+.factors-title{font-size:0.75rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--text3);font-weight:500;margin-bottom:0.75rem}
+.factor-row{display:grid;grid-template-columns:1fr 1fr auto;align-items:center;gap:1rem;padding:0.625rem 0;border-bottom:1px solid var(--border)}
+.factor-row:last-child{border-bottom:none}
+.factor-info .fname{font-size:0.825rem;color:var(--text);font-weight:500}
+.factor-info .fexpl{font-size:0.75rem;color:var(--text2);margin-top:0.15rem}
+.factor-bar{position:relative;height:10px;background:var(--surface2);border-radius:5px}
+.factor-bar .center{position:absolute;left:50%;top:0;width:1px;height:10px;background:var(--border)}
+.factor-bar .fill-pos{position:absolute;left:50%;top:0;height:10px;border-radius:0 5px 5px 0;background:#1A7A4A;opacity:0.8}
+.factor-bar .fill-neg{position:absolute;right:50%;top:0;height:10px;border-radius:5px 0 0 5px;background:#B83232;opacity:0.8}
+.factor-val{font-size:0.8rem;font-family:'DM Mono',monospace;font-weight:500;min-width:48px;text-align:right}
+.fval-pos{color:var(--green)}
+.fval-neg{color:var(--red)}
+
+.summary-box{background:var(--amber-light);border:1px solid #F0D090;border-radius:8px;padding:0.875rem 1rem;margin-top:1rem;font-size:0.825rem;color:#7A4800;line-height:1.6}
+
+.impact-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:1rem}
+.impact-item{border-left:3px solid var(--blue);padding-left:0.875rem}
+.impact-item h4{font-size:0.825rem;font-weight:500;color:var(--text);margin-bottom:0.3rem}
+.impact-item p{font-size:0.775rem;color:var(--text2);line-height:1.5}
+
+.footer{margin-top:2rem;padding-top:1rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.footer p{font-size:0.75rem;color:var(--text3)}
+
+@media(max-width:680px){
+  .metrics{grid-template-columns:1fr 1fr}
+  .grid2{grid-template-columns:1fr}
+  .pred-grid{grid-template-columns:1fr 1fr}
+  .impact-grid{grid-template-columns:1fr}
+  .factor-row{grid-template-columns:1fr auto}
+  .factor-bar{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div>
+      <span class="tag">FASE 3 — XAI</span>
+      <h1 style="margin-top:0.6rem">Sistema de Predicción de Demanda<br>con IA Explicable</h1>
+      <p>Este dashboard muestra cómo el modelo XGBoost toma sus decisiones y qué factores influyen en cada predicción de ventas.</p>
+    </div>
+    <div style="text-align:right;font-size:0.75rem;color:var(--text3);white-space:nowrap">
+      <p>Universidad Politécnica Salesiana</p>
+      <p style="margin-top:0.25rem">Cuenca, Ecuador · 2024</p>
+    </div>
+  </div>
+</div>
+
+<div class="metrics">
+  <div class="metric-card">
+    <p class="label">Predicción promedio</p>
+    <p class="value">20 <span style="font-size:1rem;font-weight:400;color:var(--text2)">und.</span></p>
+    <p class="sub">Base del modelo</p>
+  </div>
+  <div class="metric-card">
+    <p class="label">Error promedio</p>
+    <p class="value">4.3 <span style="font-size:1rem;font-weight:400;color:var(--text2)">und.</span></p>
+    <p class="sub">MAE — XGBoost optimizado</p>
+  </div>
+  <div class="metric-card">
+    <p class="label">Productos analizados</p>
+    <p class="value">8</p>
+    <p class="sub">IDs 31 a 38 en test set</p>
+  </div>
+  <div class="metric-card">
+    <p class="label">Registros de prueba</p>
+    <p class="value">2,493</p>
+    <p class="sub">20% del dataset total</p>
+  </div>
+</div>
+
+<div class="grid2">
+  <div class="card">
+    <p class="card-title">¿Qué factores importan más?</p>
+    <div id="bars"></div>
+    <p style="font-size:0.75rem;color:var(--text3);margin-top:1rem">Cuanto más larga la barra, mayor influencia en la predicción final.</p>
+  </div>
+
+  <div class="card">
+    <p class="card-title">¿Cómo decide el modelo?</p>
+    <div class="insight-item"><strong>Si vendiste mucho esta semana →</strong><br><span>El modelo predice que seguirás vendiendo bien los próximos días</span></div>
+    <div class="insight-item"><strong>Si es sábado o domingo →</strong><br><span>La predicción sube porque los fines de semana hay más clientes en tienda</span></div>
+    <div class="insight-item"><strong>Si es quincena (días 14–15) →</strong><br><span>La demanda sube porque la gente acaba de cobrar su sueldo</span></div>
+    <div class="insight-item"><strong>Si el producto viene vendiendo poco →</strong><br><span>El modelo reduce la predicción para no sobreestimar el inventario necesario</span></div>
+  </div>
+</div>
+
+<div class="card" style="margin-bottom:1rem">
+  <p class="card-title">Ejemplos reales — ¿por qué el modelo predijo eso?</p>
+  <div class="prod-tabs">
+    <button class="prod-tab active" onclick="showProd(0,this)">Galletitas de agua</button>
+    <button class="prod-tab" onclick="showProd(1,this)">Arroz</button>
+    <button class="prod-tab" onclick="showProd(2,this)">Galletitas de chocolate</button>
+  </div>
+  <div id="prod-panel"></div>
+</div>
+
+<div class="card">
+  <p class="card-title">¿Qué significa esto para el negocio?</p>
+  <div class="impact-grid">
+    <div class="impact-item">
+      <h4>Planifica con anticipación</h4>
+      <p>El modelo puede decirte cuánto va a vender cualquier producto antes de que ocurra, para cualquier fecha futura.</p>
+    </div>
+    <div class="impact-item">
+      <h4>Evita quiebres de stock</h4>
+      <p>Conocer la demanda esperada permite pedir mercadería a tiempo y en la cantidad correcta, sin excesos ni faltantes.</p>
+    </div>
+    <div class="impact-item">
+      <h4>Decisiones con respaldo</h4>
+      <p>Cada predicción viene con una explicación clara de por qué el modelo llegó a ese número, sin necesidad de conocimientos técnicos.</p>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <p>Predicción de Demanda Retail — IA Explicable (XAI) con SHAP + XGBoost</p>
+  <p>Universidad Politécnica Salesiana · 2024</p>
+</div>
+
+<script>
+const factoresGlobales = [
+  {label:"Ventas hace 7 días", pct:100},
+  {label:"Ventas de ayer", pct:58},
+  {label:"Día de la semana", pct:32},
+  {label:"Ventas hace 6 días", pct:31},
+  {label:"Día del mes", pct:25},
+  {label:"Tipo de producto", pct:21},
+  {label:"Ventas hace 2 días", pct:20},
+  {label:"Feriado / Fin de semana", pct:4},
+];
+
+const barsContainer = document.getElementById('bars');
+factoresGlobales.forEach(f=>{
+  barsContainer.innerHTML += `
+    <div class="bar-row">
+      <div class="bar-label"><span>${f.label}</span><span>${f.pct}%</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:0%" data-w="${f.pct}%"></div></div>
+    </div>`;
+});
+
+setTimeout(()=>{
+  document.querySelectorAll('.bar-fill').forEach(b=>{b.style.width=b.dataset.w});
+},100);
+
+const productos = [
+  {
+    nombre:"Galletitas de agua (ID 31)",
+    prediccion:13, promedio:20,
+    contexto:"Martes de junio — historial reciente bajo",
+    factores:[
+      {nombre:"Ventas hace 7 días", valor:-3.00, dir:"neg", explain:"El producto venía vendiendo poco esta semana"},
+      {nombre:"Día de la semana (martes)", valor:+2.65, dir:"pos", explain:"El martes tiene demanda moderada"},
+      {nombre:"Ventas hace 6 días", valor:-1.46, dir:"neg", explain:"También bajo hace 6 días"},
+      {nombre:"Ventas hace 2 días", valor:-1.38, dir:"neg", explain:"La tendencia a la baja continúa"},
+    ],
+    resumen:"El producto venía con poca actividad los días previos, lo que llevó al modelo a predecir por debajo del promedio. Solo el día de la semana compensó parcialmente la predicción."
+  },
+  {
+    nombre:"Arroz (ID 35)",
+    prediccion:9, promedio:20,
+    contexto:"Martes de octubre — historial muy bajo",
+    factores:[
+      {nombre:"Ventas hace 7 días", valor:-4.89, dir:"neg", explain:"La semana anterior fue de muy baja venta"},
+      {nombre:"Ventas de ayer", valor:-2.52, dir:"neg", explain:"Ayer tampoco se vendió mucho"},
+      {nombre:"Tipo de producto (arroz)", valor:-1.29, dir:"neg", explain:"El arroz tiene demanda base moderada"},
+      {nombre:"Día del mes (día 2)", valor:-0.90, dir:"neg", explain:"Inicio de mes, sin pico de quincena"},
+    ],
+    resumen:"Todo el historial reciente estaba bajo, sin ningún factor positivo que compensara. El modelo detectó una semana de baja actividad y ajustó la predicción muy por debajo del promedio."
+  },
+  {
+    nombre:"Galletitas de chocolate (ID 32)",
+    prediccion:19, promedio:20,
+    contexto:"Sábado de diciembre — historial alto",
+    factores:[
+      {nombre:"Ventas de ayer (32 unidades)", valor:+4.90, dir:"pos", explain:"Ayer se vendieron 32 unidades, señal muy positiva"},
+      {nombre:"Día de la semana (sábado)", valor:+2.65, dir:"pos", explain:"Los sábados la demanda sube sistemáticamente"},
+      {nombre:"Ventas hace 3 días", valor:-2.72, dir:"neg", explain:"Hace 3 días las ventas fueron bajas"},
+      {nombre:"Ventas hace 7 días", valor:-2.33, dir:"neg", explain:"La semana anterior tuvo menor actividad"},
+    ],
+    resumen:"Las ventas del día anterior estaban altas y era sábado, dos factores que juntos empujaron la predicción hacia arriba. Los días anteriores más lejanos la moderaron ligeramente."
+  }
+];
+
+function showProd(idx, btn){
+  document.querySelectorAll('.prod-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const p = productos[idx];
+  const diff = p.prediccion - p.promedio;
+  const diffStr = (diff>=0?'+':'')+diff;
+  const factHTML = p.factores.map(f=>{
+    const pct = Math.min(Math.abs(f.valor)/5*50,48).toFixed(1);
+    const valStr = (f.dir==='pos'?'+':'')+f.valor.toFixed(2);
+    const fillHTML = f.dir==='pos'
+      ? `<div class="fill-pos" style="width:${pct}%"></div>`
+      : `<div class="fill-neg" style="width:${pct}%"></div>`;
+    return `<div class="factor-row">
+      <div class="factor-info">
+        <p class="fname">${f.nombre}</p>
+        <p class="fexpl">${f.explain}</p>
+      </div>
+      <div class="factor-bar"><div class="center"></div>${fillHTML}</div>
+      <span class="factor-val ${f.dir==='pos'?'fval-pos':'fval-neg'}">${valStr}</span>
+    </div>`;
+  }).join('');
+
+  document.getElementById('prod-panel').innerHTML = `
+    <div class="pred-grid">
+      <div class="pred-cell">
+        <p class="plabel">Predicción</p>
+        <p class="pval">${p.prediccion} <span style="font-size:0.9rem;font-weight:400;color:var(--text2)">unidades</span></p>
+      </div>
+      <div class="pred-cell">
+        <p class="plabel">Promedio base</p>
+        <p class="pval">20 <span style="font-size:0.9rem;font-weight:400;color:var(--text2)">unidades</span></p>
+      </div>
+      <div class="pred-cell">
+        <p class="plabel">Contexto</p>
+        <p class="pctx" style="font-size:0.825rem;margin-top:0.25rem">${p.contexto}</p>
+      </div>
+    </div>
+    <p class="factors-title">Factores que influyeron — verde sube la predicción, rojo la baja</p>
+    ${factHTML}
+    <div class="summary-box"><strong>En resumen:</strong> ${p.resumen}</div>`;
+}
+
+showProd(0, document.querySelector('.prod-tab.active'));
+</script>
+</body>
+</html>
