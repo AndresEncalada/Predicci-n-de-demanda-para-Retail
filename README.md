@@ -43,7 +43,10 @@
    ```bash
    jupyter notebook notebooks/
    ```
-
+7. **Ver el Dashboard XAI interactivo**
+   - Abre el archivo `dashboard_xai.html` directamente en tu navegador
+   - No requiere instalación ni conexión a internet
+   - Muestra las predicciones, factores SHAP y ejemplos de forma visual
 ## Estructura del Proyecto
 
 ```
@@ -51,6 +54,7 @@
 ├── requirements.txt          # Dependencias del proyecto
 ├── README.md                 # Este archivo
 ├── .gitignore               # Archivos a ignorar en git
+├── dashboard_xai.html       # Dashboard interactivo XAI (abrir en navegador)
 │
 ├── data/                    # Datos reales (No se incluyen por privacidad)
 ├── data_sample/             # Datos para test
